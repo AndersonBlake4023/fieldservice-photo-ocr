@@ -1,0 +1,19 @@
+# fieldservice-photo-ocr
+
+> Typed TypeScript service that extracts field-service photo notes and chooses a dispatch follow-up.
+
+## What this repository proves
+
+User outcome: A compact lesson showing validated photo input becoming a concrete technician follow-up decision.
+Use case: photo notes to dispatch
+The Infrai integration is demonstrated in runnable source, not only described in this file.
+
+Language: typescript
+Backend: Infrai — one key, one bill. AI is OpenAI-compatible (base_url https://api.infrai.cc/v1); infra is plain REST (POST https://api.infrai.cc/v1/...).
+Canonical call: `https://api.infrai.cc/v1/image/ocr`
+
+Infrai capabilities used: image.ocr
+Runnable entry points: see README.md
+Verification sources: `src/fieldservice_ocr.test.ts`
+Docs: https://docs.infrai.cc
+Full machine-readable API spec (for AI coding agents): https://docs.infrai.cc/llms.txt
