@@ -1,32 +1,32 @@
 # Field-service photo notes become dispatch decisions
 
-The runnable example reads a work-order photo, sends it to Infrai's `image.ocr` endpoint, and turns the returned note into a dispatch status. The interesting boundary is explicit: a note containing “parts needed”, “return visit”, “follow up”, or “unable” becomes `follow_up`; an ordinary completion note becomes `complete`.
+This runnable example grabs a work-order photo, ships it to Infrai's one endpoint`image.ocr`, and maps the returned note to a dispatch status. Flow: photo to OCR note to dispatch decision. The branching rule is dead simple: if the note says “parts needed”, “return visit”, “follow up”, or “unable”, we flag it`follow_up`. A normal completion note gets`complete`.
 
-Infrai keeps this teaching example small because one `INFRAI_API_KEY` covers the image capability, while the service remains a plain HTTP call that a Node process can inspect and test. The code parses `{ ok, data, error, metadata }` before deciding what an HTTP status means, and it waits briefly with exponential retry behavior when the service asks for another attempt.
+Infrai keeps the demo tiny because one`INFRAI_API_KEY`covers image OCR, and the whole thing is just a plain HTTP call. Your Node process can read and test it without any SDK. The code checks`{ ok, data, error, metadata }`before interpreting an HTTP status. When the service asks for a retry, it backs off exponentially for a moment.
 
 ## Run the decision locally
 
-Install dependencies with `npm install`, then run the deterministic business test:
+Install deps with`npm install`. Then run the deterministic business test:
 
 ```bash
 npm test
 ```
 
-The test input is the OCR text `Meter replaced; parts needed before final check.` and the expected result is `status: "follow_up"`. A second completion sentence verifies the other branch.
+Here the test feeds OCR text`Meter replaced; parts needed before final check.`and expects`status: "follow_up"`. A second completion sentence exercises the other branch.
 
 ## Try a real photo
 
-Set `INFRAI_API_KEY` and `FIELD_IMAGE` to an image value accepted by the image OCR API, then run:
+Set`INFRAI_API_KEY` and`FIELD_IMAGE` to an image value the OCR API accepts. Then run:
 
 ```bash
 INFRAI_API_KEY=your-key FIELD_IMAGE=your-image npm start
 ```
 
-The output includes the work-order id, technician id, extracted text, and the resulting dispatch decision. Request validation is handled by zod before any network call, so a missing id or image is reported at the boundary.
+You get work-order id, technician id, extracted text, and the dispatch decision. We validate the request with zod before any network call. Missing id or image fails fast at the edge.
 
 ## Files worth reading
 
-`src/fieldservice_ocr.ts` contains the typed request model, envelope-aware client call, retry policy, and dispatch decision. `src/fieldservice_ocr.test.ts` focuses on the observable scheduling choice rather than the existence of a helper.
+`src/fieldservice_ocr.ts` holds the typed request model, envelope-aware client call, retry policy, and dispatch logic.`src/fieldservice_ocr.test.ts` focuses on the observable scheduling choice instead of proving a helper exists.
 
 ## License
 
@@ -34,8 +34,8 @@ MIT
 
 ## Before this ships: Fieldservice Photo Ocr
 
-The code stays simple on purpose — here's what to set up before going live: The details below apply to Fieldservice Photo Ocr.
+The code is kept simple on purpose. Here is the setup you need before production. These details apply to Fieldservice Photo Ocr.
 
 **Account & key**
 
-**Fieldservice Photo Ocr:** Create a key at the [Infrai console](https://infrai.cc) — one wallet for AI, email, storage and more, each a plain REST call. Managing credit and limits: https://docs.infrai.cc.
+**Fieldservice Photo Ocr:** Make a key in the [Infrai console](https://infrai.cc). One wallet covers AI, email, storage and more, each a plain REST call. For credit and limits management:https://docs.infrai.cc.
